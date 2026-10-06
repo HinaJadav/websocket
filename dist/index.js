@@ -1,11 +1,14 @@
 import express from "express";
-import { createServer } from "node:http";
+import { createServer } from "http";
 import "dotenv/config";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 const app = express();
 const server = createServer(app);
 const port = Number(process.env.PORT) || 3000;
-app.get("/", (req, res) => {
-    res.send("Hello from Express!");
+const __dirname = dirname(fileURLToPath(import.meta.url));
+app.get('/', (req, res) => {
+    res.sendFile(join(__dirname, 'index.html'));
 });
 server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
