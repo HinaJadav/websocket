@@ -20,10 +20,13 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
     console.log('A user connected');
 
-    socket.on('message', (msg) => {
-        console.log('Message received: ' + msg);
-    })
-
+    // socket.on('message', (msg) => {
+    //     console.log('Message received: ' + msg);
+    // })
+socket.on('message', (msg: string) => {
+  console.log('Message received: ' + msg);
+  io.emit('message', msg); // send to everyone
+});
     // socket.on('disconnect', () => {
     //     console.log('A user disconnected');
     // });
