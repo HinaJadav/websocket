@@ -27,29 +27,25 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 app.get('/', (req, res) => {
     res.sendFile(join(__dirname, 'index.html'));
 });
-io.on('connection', async (socket) => {
-    socket.on('msgEvent', async (msg) => {
-        let result;
-        try {
-            result = await db.run('INSERT INTO messages (content) VALUES (?)', msg);
-        }
-        catch (error) {
-            return;
-        }
-        io.emit('msgEvent', msg, result.lastID);
+io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
+    socket.on('msgEvent', (msg) => {
+        console.log('Message received:', msg);
+        //io.emit('msgEvent', msg); // 	All connected clients (including sender)
+        socket.broadcast.emit('msgEvent', msg); // All clients except the sender
     });
-    if (!socket.recovered) {
-        try {
-            await db.each('SELECT id, content FROM messages WHERE id > ?', [socket.handshake.auth.serverOffset || 0], (_err, row) => {
-                socket.emit('chat message', row.content, row.id);
-            });
-        }
-        catch (error) {
-            console.log("error : ", error);
-        }
-    }
+    socket.on('disconnect', () => {
+        console.log('A user disconnected:', socket.id);
+    });
 });
 server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
-//# sourceMappingURL=index.js.map
+// socket.emit(...)	Only this one client
+// io.emit(...)	All connected clients (including sender)
+// socket.broadcast.emit(...)	All clients except the sender
+// tricks: 
+// socket = one person
+// io = everyone
+// broadcast = everyone except me
+//# sourceMappingURL=index_old.js.map
