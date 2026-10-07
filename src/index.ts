@@ -8,7 +8,9 @@ import {Server} from "socket.io";
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server);  
+const io = new Server(server, {
+  connectionStateRecovery: {} // temporaty able to restore user data after disconnect user and reconnect within tim limit
+});  
 const port = Number(process.env.PORT) || 3000;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
