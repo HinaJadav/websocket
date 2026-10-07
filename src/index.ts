@@ -18,20 +18,29 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log('A user connected');
+  console.log('A user connected:', socket.id);
 
-    // socket.on('message', (msg) => {
-    //     console.log('Message received: ' + msg);
-    // })
-socket.on('message', (msg: string) => {
-  console.log('Message received: ' + msg);
-  io.emit('message', msg); // send to everyone
+  socket.on('msgEvent', (msg: string) => {
+    console.log('Message received:', msg);
+    //io.emit('msgEvent', msg); // 	All connected clients (including sender)
+    socket.broadcast.emit('msgEvent', msg); // All clients except the sender
+  });
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected:', socket.id);
+  });
 });
-    // socket.on('disconnect', () => {
-    //     console.log('A user disconnected');
-    // });
-});
+
 
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+// socket.emit(...)	Only this one client
+// io.emit(...)	All connected clients (including sender)
+// socket.broadcast.emit(...)	All clients except the sender
+
+// tricks: 
+// socket = one person
+// io = everyone
+// broadcast = everyone except me
